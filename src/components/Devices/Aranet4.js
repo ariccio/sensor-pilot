@@ -74,7 +74,10 @@ export default class Aranet4 extends React.Component {
     this.toggleConnection = this.toggleConnection.bind(this)
   }
 
-  toggleConnection () {
+  toggleConnection (loopTries) {
+    if (loopTries < 1) {
+      return
+    }
     aranet4Device.serviceCharacteristics(
       aranetServices.sensor.serviceUuid,
       aranetServices.sensor.resolvers,
@@ -93,7 +96,18 @@ export default class Aranet4 extends React.Component {
         updateInterval: sensorReadings[0].value,
       })
     }).catch((err) => {
-      debugger;
+      console.log(err.code)
+      console.log(err.message)
+      if (err.code === 19) {
+        const errStr = "Browser reports authentication canceled. This could mean user has not yet entered the PIN. Error message: '" + err.toString() + "' Trying again in a few seconds..." + loopTries + " tries remaining"
+
+        this.setState({
+          error: errStr,
+          connected: false,
+        })
+        setTimeout(() => {this.toggleConnection(loopTries - 1)}, 5000)
+        return
+      }
       this.setState({
         error: err.toString(),
         connected: false,
@@ -109,7 +123,7 @@ export default class Aranet4 extends React.Component {
             Aranet4
             <a href="https://aranet4.com" className="btn btn-link btn-sm align-middle" title="Learn more about Aranet4">Learn More</a>
           </h3>
-          <input type="button" className="btn btn-primary" onClick={this.toggleConnection} value={this.state.connected ? 'Refresh' : 'Connect'} />
+          <input type="button" className="btn btn-primary" onClick={() => this.toggleConnection(5)} value={this.state.connected ? 'Refresh' : 'Connect'} />
         </div>
         <div className="card-body">
           {this.state.error
