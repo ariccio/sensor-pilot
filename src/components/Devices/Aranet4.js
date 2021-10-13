@@ -98,7 +98,10 @@ export default class Aranet4 extends React.Component {
     }).catch((err) => {
       console.log(err.code)
       console.log(err.message)
-      if (err.code === 19) {
+      if (err.code === 19) { //19 === NetworkError
+        if (err.message === "Authentication canceled.") {
+          console.log("appears the device needs a pin")
+        }
         const errStr = "Browser reports authentication canceled. This could mean user has not yet entered the PIN. Error message: '" + err.toString() + "' Trying again in a few seconds..." + loopTries + " tries remaining"
 
         this.setState({
