@@ -93,6 +93,7 @@ export default class Aranet4 extends React.Component {
         updateInterval: sensorReadings[0].value,
       })
     }).catch((err) => {
+      debugger;
       this.setState({
         error: err.toString(),
         connected: false,

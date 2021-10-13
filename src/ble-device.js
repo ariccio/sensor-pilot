@@ -42,10 +42,14 @@ export default class BleDevice {
         return Promise.all(
           characteristics
             .filter(characteristic => characteristicUuids.includes(characteristic.uuid))
-            .map(async characteristic => ({
-              uuid: characteristic.uuid,
-              value: await characteristic.readValue(),
-            })),
+            .map(async (characteristic) => {
+              const mapped = {
+                uuid: characteristic.uuid,
+                value: await characteristic.readValue(),
+              }
+              return mapped
+            }
+            ),
         )
       })
       .then(values => values.map(value => ({
